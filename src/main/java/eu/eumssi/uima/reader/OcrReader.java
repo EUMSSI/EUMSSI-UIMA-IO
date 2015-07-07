@@ -16,12 +16,10 @@ import org.xml.sax.SAXException;
 
 import com.mongodb.DBObject;
 
-import eu.eumssi.uima.ts.AsrFiller;
-import eu.eumssi.uima.ts.AsrToken;
-import eu.eumssi.uima.ts.AsrWord;
 import eu.eumssi.uima.ts.OcrSegment;
 import eu.eumssi.uima.ts.Segment;
 import eu.eumssi.uima.ts.SourceMeta;
+import eu.eumssi.uima.ts.TopOcrSegment;
 
 public class OcrReader extends MongoReaderBase {
 
@@ -36,7 +34,7 @@ public class OcrReader extends MongoReaderBase {
 	public static final String PARAM_ONLYBEST = "OnlyBest";
 	@ConfigurationParameter(name=PARAM_ONLYBEST, mandatory=false, defaultValue="true",
 			description="only mark best hypothesis for each word")
-	private Boolean onlyBest = true;
+	private Boolean onlyBest;
 
 
 	/* (non-Javadoc)
@@ -72,32 +70,44 @@ public class OcrReader extends MongoReaderBase {
 					tokenIndex = documentText.length();
 					logger.fine(detection.toString());
 					List<DBObject> hypotheses = (List<DBObject>)detection.get("Hypotheses");
-					DBObject topHypothesis = hypotheses.get(0);
-					String ocrText = topHypothesis.get("text").toString(); // should be a String field anyway
-					logger.fine(ocrText);
+					Boolean first = true;
 					int beginTime = (int) ((double)detection.get("mediaRelIncrTimePoint_S"))*1000;
 					int endTime = (int) ((double)detection.get("mediaIncrDuration_S"))*1000 + beginTime;
-					double conf = (double) topHypothesis.get("score");
-					double secondScore = 0;
-					try {
-						secondScore = (double) hypotheses.get(1).get("score");
-					} catch (IndexOutOfBoundsException e) {
-						// treat score as 0
+					for (DBObject hypothesis : hypotheses) {
+						String ocrText = hypothesis.get("text").toString(); // should be a String field anyway
+						logger.fine(ocrText);
+						double conf = (double) hypothesis.get("score");
+						OcrSegment ocrSegment;
+						if (first) {
+							if (tokenIndex > 0) {
+								documentText.append("\n");
+								tokenIndex++;
+							}
+							documentText.append(ocrText);
+							double secondScore = 0;
+							try {
+								secondScore = (double) hypotheses.get(1).get("score");
+							} catch (IndexOutOfBoundsException e) {
+								// treat score as 0
+							}
+							double confRatio = secondScore / conf;
+							ocrSegment = new TopOcrSegment(jcas);
+							((TopOcrSegment)ocrSegment).setConfidenceRatio(confRatio);
+							first = false;
+						} else {
+							ocrSegment = new OcrSegment(jcas);
+						}
+						ocrSegment.setBegin(tokenIndex);
+						ocrSegment.setEnd(documentText.length());
+						ocrSegment.setBeginTime(beginTime);
+						ocrSegment.setEndTime(endTime);
+						ocrSegment.setConfidence(conf);
+						ocrSegment.setText(ocrText);
+						ocrSegment.addToIndexes();
+						if (onlyBest) { // only mark top hypothesis
+							break;
+						}
 					}
-					double confRatio = secondScore / conf;
-					if (tokenIndex > 0) {
-						documentText.append("\n");
-						tokenIndex++;
-					}
-					documentText.append(ocrText);
-					OcrSegment ocrSegment;
-					ocrSegment = new OcrSegment(jcas);
-					ocrSegment.setBegin(tokenIndex);
-					ocrSegment.setEnd(documentText.length());
-					ocrSegment.setBeginTime(beginTime);
-					ocrSegment.setEndTime(endTime);
-					ocrSegment.setConfidence(conf);
-					ocrSegment.addToIndexes();
 				}
 				// create segment annotation
 				Segment segAnno = new Segment(jcas);
