@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.eumssi.uima</groupId>
 	<artifactId>eumssi-io</artifactId>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -129,5 +129,10 @@
 			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
 			<artifactId>de.tudarmstadt.ukp.dkpro.core.api.ner-asl</artifactId>
 			</dependency>
+		<dependency>
+			<groupId>edu.upf.glicom.uima</groupId>
+			<artifactId>ConfirmLinkAnnotator</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

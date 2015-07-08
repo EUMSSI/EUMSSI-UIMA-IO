@@ -33,6 +33,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity;
+import edu.upf.glicom.uima.ts.VerifiedDBpediaResource;
 import eu.eumssi.uima.ts.SourceMeta;
 
 /**
@@ -92,7 +93,7 @@ public class NER2MongoConsumer extends JCasConsumer_ImplBase {
 		
 		/* get all dbpedia annotations (best candidate)*/
 		BasicDBObject dbpediaResources = new BasicDBObject();
-		for (DBpediaResource resource : select(jCAS, TopDBpediaResource.class)) {
+		for (DBpediaResource resource : select(jCAS, VerifiedDBpediaResource.class)) {
 			logger.fine(String.format("  %-16s\t%-10s\t%-10s%n", 
 					resource.getCoveredText(),
 					resource.getUri(),
