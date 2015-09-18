@@ -89,12 +89,13 @@ public class NER2MongoConsumer extends JCasConsumer_ImplBase {
 	@Override
 	public void process(JCas jCAS) throws AnalysisEngineProcessException {
 		SourceMeta meta = selectSingle(jCAS, SourceMeta.class);
-		logger.fine("\n\n=========\n\n" + meta.getDocumentId() + ": " + jCAS.getDocumentText() + "\n");
+		String documentText = jCAS.getDocumentText();
+		logger.fine("\n\n=========\n\n" + meta.getDocumentId() + ": " + documentText + "\n");
 		
 		/* get all dbpedia annotations (best candidate)*/
 		BasicDBObject dbpediaResources = new BasicDBObject();
 		for (DBpediaResource resource : select(jCAS, VerifiedDBpediaResource.class)) {
-			logger.fine(String.format("  %-16s\t%-10s\t%-10s%n", 
+			logger.info(String.format("  %-16s\t%-10s\t%-10s%n", 
 					resource.getCoveredText(),
 					resource.getUri(),
 					resource.getTypes()));
@@ -110,7 +111,9 @@ public class NER2MongoConsumer extends JCasConsumer_ImplBase {
 			logger.fine(String.format("  %-16s %-10s %n", 
 					entity.getCoveredText(),
 					entity.getValue()));
-			addWithType(entities, entity.getValue(), entity.getCoveredText());
+			for (String type : convertTypes(entity.getValue())) {
+				addWithType(entities, type, entity.getCoveredText());
+			}
 			addWithType(entities, "all", entity.getCoveredText());
 		}
 
@@ -138,10 +141,13 @@ public class NER2MongoConsumer extends JCasConsumer_ImplBase {
 	 */
 	private static Set<String> convertTypes(String types) {
 		Set<String> typeSet = new HashSet<String>();
-		if (types.matches(".*Person.*")) typeSet.add("PERSON");
-		if (types.matches(".*Place.*")) typeSet.add("LOCATION");
-		if (types.matches(".*Organisation.*")) typeSet.add("ORGANIZATION");
-		if (types.matches(".*City.*")) typeSet.add("City");
+		if (types.matches("(PERSON)|(I-PER)|(.*Person.*)")) typeSet.add("PERSON");
+		if (types.matches("(LOCATION)|(I-LOC)|(.*Place.*)")) 
+			typeSet.add("LOCATION");
+		if (types.matches("(ORGANIZATION)|(I-ORG)|(.*Organisation.*)")) typeSet.add("ORGANIZATION");
+		if (types.matches("(MISC)|(I-MISC)")) typeSet.add("MISC");
+		if (types.matches(".*City.*"))
+			typeSet.add("City");
 		if (types.matches(".*Country.*")) typeSet.add("Country");
 		if (typeSet.isEmpty()) {
 			typeSet.add("other");
