@@ -36,6 +36,13 @@ public class OcrReader extends MongoReaderBase {
 			description="only mark best hypothesis for each word")
 	private Boolean onlyBest;
 
+	/**
+	 * only mark best hypothesis for each word
+	 */
+	public static final String PARAM_VERTICALLY_ALIGNED = "VerticallyAligned";
+	@ConfigurationParameter(name=PARAM_VERTICALLY_ALIGNED, mandatory=false, defaultValue="true",
+			description="put all hypotheses at the same character offsets (document text only contains best), if false concatenate all hypotheses sequentially")
+	private Boolean verticallyAligned;
 
 	/* (non-Javadoc)
 	 * @see org.apache.uima.collection.CollectionReader#getNext(org.apache.uima.cas.CAS)
@@ -65,15 +72,20 @@ public class OcrReader extends MongoReaderBase {
 					segmentIndex += 3;
 					tokenIndex += 3;
 				}
+				@SuppressWarnings("unchecked")
 				List<DBObject> detectionList = (List<DBObject>) ((DBObject) doc.get(f.replaceAll("\\.", SEPARATOR))).get("VideoTextDetection");
 				for (DBObject detection : detectionList) {
 					tokenIndex = documentText.length();
 					logger.fine(detection.toString());
+					@SuppressWarnings("unchecked")
 					List<DBObject> hypotheses = (List<DBObject>)detection.get("Hypotheses");
 					Boolean first = true;
 					int beginTime = (int) ((double)detection.get("mediaRelIncrTimePoint_S"))*1000;
 					int endTime = (int) ((double)detection.get("mediaIncrDuration_S"))*1000 + beginTime;
 					for (DBObject hypothesis : hypotheses) {
+						if (!verticallyAligned) { // move offset for each hypothesis
+							tokenIndex = documentText.length();
+						}
 						String ocrText = hypothesis.get("text").toString(); // should be a String field anyway
 						logger.fine(ocrText);
 						double conf = (double) hypothesis.get("score");
@@ -95,6 +107,11 @@ public class OcrReader extends MongoReaderBase {
 							((TopOcrSegment)ocrSegment).setConfidenceRatio(confRatio);
 							first = false;
 						} else {
+							if (!verticallyAligned) { // add all hypotheses to document text
+								documentText.append("\n");
+								tokenIndex++;
+								documentText.append(ocrText);
+							}
 							ocrSegment = new OcrSegment(jcas);
 						}
 						ocrSegment.setBegin(tokenIndex);
