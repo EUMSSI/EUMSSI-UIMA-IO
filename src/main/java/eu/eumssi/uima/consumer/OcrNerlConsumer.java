@@ -130,7 +130,7 @@ public class OcrNerlConsumer extends JCasConsumer_ImplBase {
 		BasicDBObject query = new BasicDBObject();
 		query.append("_id", UUID.fromString(meta.getDocumentId()));
 		BasicDBObject updates = new BasicDBObject();
-		updates.append("meta.extracted.ocr.nerl", ocrNerlDbList);
+		updates.append("processing.results.text.ocr-nerl", ocrNerlDbList);
 		BasicDBObject update = new BasicDBObject();
 		update.append("$set", updates);
 		update.append("$addToSet", new BasicDBObject("processing.available_data", "ocr-nerl"));
