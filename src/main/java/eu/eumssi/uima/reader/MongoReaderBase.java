@@ -189,7 +189,45 @@ public abstract class MongoReaderBase extends CasCollectionReader_ImplBase{
 		return new Progress[] { new ProgressImpl(this.completed, (int) this.totalDocs, Progress.ENTITIES) };
 	}
 
+	/**
+	 * Utility function to remove characters that can't be represented in XML 1.0
+	 * 
+	 * @param text original text
+	 * @return text containing only valid XML characters, others replaced by space
+	 */
+	protected static String validXmlCharacters(String text) {
+		return validXmlCharacters(text, " ");
+	}
 
+	/**
+	 * Utility function to remove characters that can't be represented in XML 1.0
+	 * based on http://stackoverflow.com/a/28283387
+	 * 
+	 * @param text original text
+	 * @param substitute substitution string for invalid characters
+	 * @return text containing only valid XML characters, others replaced by space
+	 */
+	protected static String validXmlCharacters(String text, String substitute) {
+	StringBuilder sb = new StringBuilder();
+	for (int i = 0; i < text.length(); i++) {
+	    int codePoint = text.codePointAt(i);
+	    if (codePoint > 0xFFFF) {
+	        i++;
+	    }
+	    if ((codePoint == 0x9) || (codePoint == 0xA) || (codePoint == 0xD)
+	            || ((codePoint >= 0x20) && (codePoint <= 0xD7FF))
+	            || ((codePoint >= 0xE000) && (codePoint <= 0xFFFD))
+	            || ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
+	        sb.appendCodePoint(codePoint);
+	    }
+	    else {
+	    	sb.append(substitute);
+	    }
+	}
+	return sb.toString();
+}
+	
+	
 	/**
 	 * return example descriptor (XML) when calling main method
 	 * @param args not used
