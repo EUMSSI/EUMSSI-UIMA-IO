@@ -40,48 +40,10 @@ import eu.eumssi.uima.ts.SourceMeta;
  * @author jgrivolla
  *
  */
-public class NER2MongoConsumer extends JCasConsumer_ImplBase {
+public class NER2MongoConsumer extends MongoConsumerBase {
 
-	private DBCollection coll;
 	private static Logger logger = Logger.getLogger(NER2MongoConsumer.class.toString());;
 	
-	public static final String PARAM_MONGOURI = "MongoUri";
-	@ConfigurationParameter(name=PARAM_MONGOURI, mandatory=true, defaultValue="mongodb://localhost",
-			description="URI of MongoDB service")
-	private String mongoUri;
-	public static final String PARAM_MONGODB = "MongoDb";
-	@ConfigurationParameter(name=PARAM_MONGODB, mandatory=true, defaultValue="",
-			description="Name of Mongo DB")
-	private String mongoDb;
-	public static final String PARAM_MONGOCOLLECTION = "MongoCollection";
-	@ConfigurationParameter(name=PARAM_MONGOCOLLECTION, mandatory=true, defaultValue="",
-			description="Name of Mongo collection")
-	private String mongoCollection;
-	private MongoClient mongoClient;
-	private DB db;
-
-	
-	/**
-	 * @return 
-	 * @throws UnknownHostException 
-	 * @throws ResourceInitializationException 
-	 * 
-	 */
-	public void initialize(UimaContext context) throws ResourceInitializationException {
-		super.initialize(context);
-		try {
-			logger.info("mongoUri: "+this.mongoUri);
-			logger.info("monoDb"+this.mongoDb);
-			MongoClientURI uri = new MongoClientURI(this.mongoUri);
-			this.mongoClient = new MongoClient(uri);
-		} catch (UnknownHostException e) {
-			throw new ResourceInitializationException(e);
-		}
-		this.db = mongoClient.getDB(this.mongoDb);
-		logger.info("connected to DB "+this.db.getName());
-		this.coll = db.getCollection(this.mongoCollection);
-		logger.info("connected to Collection "+this.coll.getName());
-	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.uima.analysis_component.CasAnnotator_ImplBase#process(org.apache.uima.cas.CAS)
@@ -95,7 +57,7 @@ public class NER2MongoConsumer extends JCasConsumer_ImplBase {
 		/* get all dbpedia annotations (best candidate)*/
 		BasicDBObject dbpediaResources = new BasicDBObject();
 		for (DBpediaResource resource : select(jCAS, VerifiedDBpediaResource.class)) {
-			logger.info(String.format("  %-16s\t%-10s\t%-10s%n", 
+			logger.fine(String.format("  %-16s\t%-10s\t%-10s%n", 
 					resource.getCoveredText(),
 					resource.getUri(),
 					resource.getTypes()));
@@ -127,10 +89,10 @@ public class NER2MongoConsumer extends JCasConsumer_ImplBase {
 		update.append("$set", updates);
 		update.append("$addToSet", new BasicDBObject("processing.available_data", "ner"));
 		try {
-			coll.update(query, update);
+			this.coll.update(query, update);
 		} catch (Exception e) {
 			logger.severe(e.toString());
-			logger.severe(coll.findOne(new BasicDBObject("_id", UUID.fromString(meta.getDocumentId()))).toString());
+			logger.severe(this.coll.findOne(new BasicDBObject("_id", UUID.fromString(meta.getDocumentId()))).toString());
 		}
 	}
 

@@ -95,7 +95,7 @@ public class OcrReader extends MongoReaderBase {
 								documentText.append("\n");
 								tokenIndex++;
 							}
-							documentText.append(ocrText);
+							documentText.append(ocrText + " .");
 							double secondScore = 0;
 							try {
 								secondScore = (double) hypotheses.get(1).get("score");
@@ -110,7 +110,7 @@ public class OcrReader extends MongoReaderBase {
 							if (!verticallyAligned) { // add all hypotheses to document text
 								documentText.append("\n");
 								tokenIndex++;
-								documentText.append(ocrText);
+								documentText.append(ocrText + " .");
 							}
 							ocrSegment = new OcrSegment(jcas);
 						}
