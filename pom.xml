@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.eumssi.uima</groupId>
 	<artifactId>eumssi-io</artifactId>
-	<version>0.2</version>
+	<version>0.3</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -133,6 +133,11 @@
 			<groupId>edu.upf.glicom.uima</groupId>
 			<artifactId>ConfirmLinkAnnotator</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.upf.glicom.uima</groupId>
+			<artifactId>opinionAnnotators</artifactId>
+			<version>0.2</version>
 		</dependency>
 	</dependencies>
 </project>
