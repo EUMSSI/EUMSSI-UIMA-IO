@@ -44,6 +44,15 @@ public class NER2MongoConsumer extends MongoConsumerBase {
 
 	private static Logger logger = Logger.getLogger(NER2MongoConsumer.class.toString());;
 	
+	public static final String PARAM_FIELD = "OutputField";
+	@ConfigurationParameter(name=PARAM_FIELD, mandatory=false, defaultValue="meta.extracted.text",
+			description="Name of output field (base, will add ner and dbpedia)")
+	protected String outputField;
+	public static final String PARAM_QUEUE = "QueueName";	
+	// override default values for configuration parameters
+	@ConfigurationParameter(name=PARAM_QUEUE, mandatory=false, defaultValue="ner",
+			description="Queue name to mark in processing.available_data")
+	protected String queueName;
 
 	/* (non-Javadoc)
 	 * @see org.apache.uima.analysis_component.CasAnnotator_ImplBase#process(org.apache.uima.cas.CAS)
@@ -79,15 +88,18 @@ public class NER2MongoConsumer extends MongoConsumerBase {
 			addWithType(entities, "all", entity.getCoveredText());
 		}
 
+		BasicDBObject NEs = new BasicDBObject();
+		NEs.append("dbpedia", dbpediaResources);
+		NEs.append("ner", entities);
+
 		/* write to MongoDB */
 		BasicDBObject query = new BasicDBObject();
 		query.append("_id", UUID.fromString(meta.getDocumentId()));
 		BasicDBObject updates = new BasicDBObject();
-		updates.append("meta.extracted.text.dbpedia", dbpediaResources);
-		updates.append("meta.extracted.text.ner", entities);
+		updates.append(this.outputField, NEs);
 		BasicDBObject update = new BasicDBObject();
 		update.append("$set", updates);
-		update.append("$addToSet", new BasicDBObject("processing.available_data", "ner"));
+		update.append("$addToSet", new BasicDBObject("processing.available_data", this.queueName));
 		try {
 			this.coll.update(query, update);
 		} catch (Exception e) {
