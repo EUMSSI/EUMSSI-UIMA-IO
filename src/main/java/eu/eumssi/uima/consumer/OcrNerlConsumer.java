@@ -42,17 +42,6 @@ public class OcrNerlConsumer extends MongoConsumerBase {
 
 	private static Logger logger = Logger.getLogger(OcrNerlConsumer.class.toString());;
 
-	// override default values for configuration parameters
-	@ConfigurationParameter(name=PARAM_FIELD, mandatory=true, 
-			defaultValue="processing.results.text.ocr-nerl",
-			description="Name of output field")
-	protected String outputField;
-
-	@ConfigurationParameter(name=PARAM_QUEUE, mandatory=true, 
-			defaultValue="ocr-nerl",
-			description="Queue name to mark in processing.available_data")
-	protected String queueName;
-
 
 	/* (non-Javadoc)
 	 * @see org.apache.uima.analysis_component.CasAnnotator_ImplBase#process(org.apache.uima.cas.CAS)

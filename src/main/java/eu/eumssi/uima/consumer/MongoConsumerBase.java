@@ -41,13 +41,14 @@ public abstract class MongoConsumerBase extends JCasConsumer_ImplBase {
 			description="Name of Mongo collection")
 	private String mongoCollection;
 	public static final String PARAM_FIELD = "OutputField";
-	@ConfigurationParameter(name=PARAM_FIELD, mandatory=true,
-			description="Name of output field")
+	@ConfigurationParameter(name=PARAM_FIELD, mandatory=false,
+			description="Name of output field (default meta.extracted.<queueName>)")
 	protected String outputField;
 	public static final String PARAM_QUEUE = "QueueName";
 	@ConfigurationParameter(name=PARAM_QUEUE, mandatory=true,
 			description="Queue name to mark in processing.available_data")
 	protected String queueName;
+	
 	protected MongoClient mongoClient;
 	protected DB db;
 
@@ -72,8 +73,18 @@ public abstract class MongoConsumerBase extends JCasConsumer_ImplBase {
 		logger.info("connected to DB "+this.db.getName());
 		this.coll = db.getCollection(this.mongoCollection);
 		logger.info("connected to Collection "+this.coll.getName());
+		if (isNull(this.outputField)) {
+			this.outputField = "meta.extracted."+this.queueName;
+		}
 	}
 
+	static protected boolean isNull(Object... objects) {
+		for (Object o : objects) {
+			if (o == null || o.equals(new String("")))
+				return true;
+		}
+		return false;
+	}
 
 	/**
 	 * return example descriptor (XML) when calling main method

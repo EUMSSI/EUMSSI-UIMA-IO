@@ -42,17 +42,6 @@ public class FakeAsrSegmentConsumer extends MongoConsumerBase {
 			description="Name of Mongo collection for segments")
 	private String segmentMongoCollection;
 	
-	
-	public static final String PARAM_FIELD = "OutputField";
-	@ConfigurationParameter(name=PARAM_FIELD, mandatory=false, defaultValue="",
-			description="Name of output field (not used)")
-	protected String outputField;
-	public static final String PARAM_QUEUE = "QueueName";	
-	// override default values for configuration parameters
-	@ConfigurationParameter(name=PARAM_QUEUE, mandatory=false, defaultValue="segments-fakeasr",
-			description="Queue name to mark in processing.available_data")
-	protected String queueName;
-
 
 	/**
 	 * @return 
@@ -130,7 +119,7 @@ public class FakeAsrSegmentConsumer extends MongoConsumerBase {
 		BasicDBObject query = new BasicDBObject();
 		query.append("_id", UUID.fromString(meta.getDocumentId()));
 		BasicDBObject update = new BasicDBObject();
-		update.append("$addToSet", new BasicDBObject("processing.available_data", queueName));
+		update.append("$addToSet", new BasicDBObject("processing.available_data", this.queueName));
 		try {
 			this.coll.update(query, update);
 		} catch (Exception e) {

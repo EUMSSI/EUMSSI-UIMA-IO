@@ -7,7 +7,6 @@ import static org.apache.uima.fit.util.JCasUtil.select;
 import static org.apache.uima.fit.util.JCasUtil.selectSingle;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,21 +15,15 @@ import java.util.logging.Logger;
 
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.fit.component.JCasConsumer_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.dbpedia.spotlight.uima.types.DBpediaResource;
-import org.dbpedia.spotlight.uima.types.TopDBpediaResource;
 import org.xml.sax.SAXException;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 
 import de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity;
 import edu.upf.glicom.uima.ts.VerifiedDBpediaResource;
@@ -42,17 +35,13 @@ import eu.eumssi.uima.ts.SourceMeta;
  */
 public class NER2MongoConsumer extends MongoConsumerBase {
 
-	private static Logger logger = Logger.getLogger(NER2MongoConsumer.class.toString());;
+	private static Logger logger = Logger.getLogger(NER2MongoConsumer.class.toString());
 	
-	public static final String PARAM_FIELD = "OutputField";
-	@ConfigurationParameter(name=PARAM_FIELD, mandatory=false, defaultValue="meta.extracted.text",
-			description="Name of output field (base, will add ner and dbpedia)")
-	protected String outputField;
-	public static final String PARAM_QUEUE = "QueueName";	
-	// override default values for configuration parameters
-	@ConfigurationParameter(name=PARAM_QUEUE, mandatory=false, defaultValue="ner",
-			description="Queue name to mark in processing.available_data")
-	protected String queueName;
+	
+	public void initialize(UimaContext context) throws ResourceInitializationException {
+		super.initialize(context);
+	}
+
 
 	/* (non-Javadoc)
 	 * @see org.apache.uima.analysis_component.CasAnnotator_ImplBase#process(org.apache.uima.cas.CAS)

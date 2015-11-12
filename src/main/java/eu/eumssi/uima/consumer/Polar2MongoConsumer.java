@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
@@ -28,21 +29,12 @@ import eu.eumssi.uima.ts.SourceMeta;
  */
 public class Polar2MongoConsumer extends MongoConsumerBase {
 
-	private static Logger logger = Logger.getLogger(Polar2MongoConsumer.class.toString());;
-
-	public static final String PARAM_FIELD = "OutputField";
-	@ConfigurationParameter(name=PARAM_FIELD, mandatory=false, defaultValue="meta.extracted.text.polarity",
-			description="Name of output field")
-	protected String outputField;
-	public static final String PARAM_QUEUE = "QueueName";	
-	// override default values for configuration parameters
-	@ConfigurationParameter(name=PARAM_QUEUE, mandatory=false, defaultValue="polarity",
-			description="Queue name to mark in processing.available_data")
-	protected String queueName;
+	private static Logger logger = Logger.getLogger(Polar2MongoConsumer.class.toString());
 
 	static final String NEUTRAL = "NEUTRAL";
 	static final String POSITIVE = "POSITIVE";
 	static final String NEGATIVE = "NEGATIVE";
+
 
 	/* (non-Javadoc)
 	 * @see org.apache.uima.analysis_component.CasAnnotator_ImplBase#process(org.apache.uima.cas.CAS)
