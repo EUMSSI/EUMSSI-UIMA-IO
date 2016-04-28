@@ -43,6 +43,7 @@ public abstract class MongoConsumerBase extends JCasConsumer_ImplBase {
 	public static final String PARAM_FIELD = "OutputField";
 	@ConfigurationParameter(name=PARAM_FIELD, mandatory=false,
 			description="Name of output field (default meta.extracted.<queueName>)")
+	protected String outputFieldParam;
 	protected String outputField;
 	public static final String PARAM_QUEUE = "QueueName";
 	@ConfigurationParameter(name=PARAM_QUEUE, mandatory=true,
@@ -73,8 +74,10 @@ public abstract class MongoConsumerBase extends JCasConsumer_ImplBase {
 		logger.info("connected to DB "+this.db.getName());
 		this.coll = db.getCollection(this.mongoCollection);
 		logger.info("connected to Collection "+this.coll.getName());
-		if (isNull(this.outputField)) {
+		if (isNull(this.outputFieldParam)) {
 			this.outputField = "meta.extracted."+this.queueName;
+		} else {
+			this.outputField = this.outputFieldParam;
 		}
 	}
 
