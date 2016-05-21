@@ -121,11 +121,6 @@
 			<artifactId>uimaj-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.dbpedia.spotlight</groupId>
-			<artifactId>uima</artifactId>
-			<version>0.8-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
 			<artifactId>de.tudarmstadt.ukp.dkpro.core.api.ner-asl</artifactId>
 			</dependency>
