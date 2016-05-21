@@ -83,9 +83,7 @@ public class OcrReader extends MongoReaderBase {
 					int beginTime = (int) ((double)detection.get("mediaRelIncrTimePoint_S"))*1000;
 					int endTime = (int) ((double)detection.get("mediaIncrDuration_S"))*1000 + beginTime;
 					for (DBObject hypothesis : hypotheses) {
-						if (!verticallyAligned) { // move offset for each hypothesis
-							tokenIndex = documentText.length();
-						}
+						tokenIndex = documentText.length();
 						String ocrText = hypothesis.get("text").toString(); // should be a String field anyway
 						logger.fine(ocrText);
 						double conf = (double) hypothesis.get("score");
