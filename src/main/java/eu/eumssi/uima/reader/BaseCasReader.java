@@ -91,6 +91,11 @@ public class BaseCasReader extends MongoReaderBase{
 		} catch (NullPointerException e) {
 			// just leave text empty if document doesn't have one
 		}
+		try {
+			metadata.setDatePublished(doc.get("meta###source###datePublished").toString());
+		} catch (NullPointerException e) {
+			// just leave text empty if document doesn't have one
+		}
 		metadata.addToIndexes();
 
 		this.completed++;
