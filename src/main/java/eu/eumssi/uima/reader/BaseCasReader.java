@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.apache.uima.UimaContext;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.collection.CollectionException;
@@ -113,6 +114,14 @@ public class BaseCasReader extends MongoReaderBase{
 	 */
 	public static void main(String[] args) throws ResourceInitializationException, FileNotFoundException, SAXException, IOException {
 		CollectionReaderFactory.createReaderDescription(BaseCasReader.class).toXML(System.out);
+	}
+
+
+	@Override
+	public void initialize(UimaContext context)
+			throws ResourceInitializationException {
+		super.initialize(context);
+		
 	}
 
 }

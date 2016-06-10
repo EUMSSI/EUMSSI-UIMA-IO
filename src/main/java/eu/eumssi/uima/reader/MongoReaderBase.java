@@ -76,6 +76,15 @@ public abstract class MongoReaderBase extends CasCollectionReader_ImplBase{
 	protected String[] fieldsList;
 	
 	/**
+	 * additional metadata fields in MongoDB (dot notation), comma separated
+	 */
+	public static final String PARAM_METAFIELDS = "MongoMetaFields";
+	@ConfigurationParameter(name=PARAM_METAFIELDS, mandatory=false,
+			description="additional metadata fields in MongoDB (dot notation), comma separated")
+	protected String metaFieldsString;
+	protected String[] metaFieldsList;
+	
+	/**
 	 * document language (as MongoDB expression)
 	 */
 	public static final String PARAM_LANG = "Language";
@@ -146,9 +155,17 @@ public abstract class MongoReaderBase extends CasCollectionReader_ImplBase{
 		//TODO: properly make fields configurable
 		fields.put("id", "$_id");
 		fields.put("lang", (DBObject) JSON.parse(this.language));
-		this.fieldsList = this.fieldsString.split("\\s*,\\s*");
+		this.fieldsList = this.fieldsString.split(",");
 		for (String f: this.fieldsList) {
+			f = f.trim();
 			fields.put(f.replaceAll("\\.", SEPARATOR), "$"+f);
+		}
+		if (this.metaFieldsString != null) {
+			this.metaFieldsList = this.metaFieldsString.split(",");
+			for (String f: this.metaFieldsList) {
+				f = f.trim();
+				fields.put(f.replaceAll("\\.", SEPARATOR), "$"+f);
+			}
 		}
 		System.out.println(fields);
 		//fields.put("text", "$meta.source.text");
