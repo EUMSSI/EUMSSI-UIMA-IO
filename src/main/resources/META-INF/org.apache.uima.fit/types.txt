@@ -1,2 +1,3 @@
 classpath*:org/dbpedia/spotlight/uima/types/*.xml
 classpath*:eu/eumssi/uima/ts/*.xml
+classpath*:desc/KeyPhraseDescriptor.xml
