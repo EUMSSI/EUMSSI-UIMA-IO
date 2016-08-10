@@ -65,6 +65,7 @@ public class Polar2MongoConsumer extends MongoConsumerBase {
 		query.append("_id", UUID.fromString(meta.getDocumentId()));
 		BasicDBObject updates = new BasicDBObject();
 		updates.append(this.outputField, polObject);
+		updates.append("processing.queues."+this.queueName, "processed");
 		BasicDBObject update = new BasicDBObject();
 		update.append("$set", updates);
 		update.append("$addToSet", new BasicDBObject("processing.available_data", this.queueName));
