@@ -140,4 +140,10 @@
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>glicom</id>
+			<url>http://apps.glicom.upf.edu/artifactory/repo</url>
+		</repository>
+	</repositories>
 </project>
