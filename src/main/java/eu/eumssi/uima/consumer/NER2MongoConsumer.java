@@ -20,6 +20,7 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.dbpedia.spotlight.uima.types.DBpediaResource;
+import org.dbpedia.spotlight.uima.types.TopDBpediaResource;
 import org.xml.sax.SAXException;
 
 import com.mongodb.BasicDBList;
@@ -36,8 +37,8 @@ import eu.eumssi.uima.ts.SourceMeta;
 public class NER2MongoConsumer extends MongoConsumerBase {
 
 	private static Logger logger = Logger.getLogger(NER2MongoConsumer.class.toString());
-	
-	
+
+
 	public void initialize(UimaContext context) throws ResourceInitializationException {
 		super.initialize(context);
 	}
@@ -51,18 +52,33 @@ public class NER2MongoConsumer extends MongoConsumerBase {
 		SourceMeta meta = selectSingle(jCAS, SourceMeta.class);
 		String documentText = jCAS.getDocumentText();
 		logger.fine("\n\n=========\n\n" + meta.getDocumentId() + ": " + documentText + "\n");
-		
-		/* get all dbpedia annotations (best candidate)*/
-		BasicDBObject dbpediaResources = new BasicDBObject();
+
+		/* get all dbpedia annotations (best candidate, filtered)*/
+		BasicDBObject filteredDbpediaResources = new BasicDBObject();
 		for (DBpediaResource resource : select(jCAS, VerifiedDBpediaResource.class)) {
 			logger.fine(String.format("  %-16s\t%-10s\t%-10s%n", 
 					resource.getCoveredText(),
 					resource.getUri(),
 					resource.getTypes()));
 			for (String type : convertTypes(resource.getTypes())) {
-				addWithType(dbpediaResources, type, resource.getUri());
+				addWithType(filteredDbpediaResources, type, resource.getUri());
 			}
-			addWithType(dbpediaResources, "all", resource.getUri());
+			addWithType(filteredDbpediaResources, "all", resource.getUri());
+		}
+
+		/* get all dbpedia annotations (best candidate, unfiltered)*/
+		BasicDBObject dbpediaResources = new BasicDBObject();
+		for (DBpediaResource resource : select(jCAS, TopDBpediaResource.class)) {
+			if (resource.getCoveredText().contains(" ") || !resource.getCoveredText().equals(resource.getCoveredText().toLowerCase())) {
+				logger.fine(String.format("  %-16s\t%-10s\t%-10s%n", 
+						resource.getCoveredText(),
+						resource.getUri(),
+						resource.getTypes()));
+				for (String type : convertTypes(resource.getTypes())) {
+					addWithType(dbpediaResources, type, resource.getUri());
+				}
+				addWithType(dbpediaResources, "all", resource.getUri());
+			}
 		}
 
 		/* get all Stanford NER annotations */
@@ -79,6 +95,7 @@ public class NER2MongoConsumer extends MongoConsumerBase {
 
 		BasicDBObject NEs = new BasicDBObject();
 		NEs.append("dbpedia", dbpediaResources);
+		NEs.append("dbpedia-filtered", filteredDbpediaResources);
 		NEs.append("ner", entities);
 
 		/* write to MongoDB */
