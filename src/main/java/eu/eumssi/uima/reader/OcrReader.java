@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import com.mongodb.DBObject;
 
+import eu.eumssi.uima.reader.util.EumssiMetaLoader;
 import eu.eumssi.uima.ts.OcrSegment;
 import eu.eumssi.uima.ts.Segment;
 import eu.eumssi.uima.ts.SourceMeta;
@@ -140,27 +141,13 @@ public class OcrReader extends MongoReaderBase {
 				// just leave text empty if document doesn't have one
 			}
 		}
-
 		jcas.setDocumentText(documentText.toString());
 
 		// create metadata annotation
-		SourceMeta metadata = new SourceMeta(jcas);
-		try {
-			String lang = doc.get("lang").toString(); // should be a String field anyway
-			jcas.setDocumentLanguage(lang);
-			metadata.setLanguage(lang);
-		} catch (NullPointerException e) {
-			// just leave language empty if document doesn't have one
-		}
-		if (metadata.getView().getDocumentText() != null) {
-			metadata.setBegin(0);
-			metadata.setEnd(metadata.getView().getDocumentText().length());
-		}
-		metadata.setDocumentId(documentId);
+		SourceMeta metadata = EumssiMetaLoader.getMeta(jcas, doc);
 		metadata.addToIndexes();
 
 		this.completed++;
-
 	}
 
 
