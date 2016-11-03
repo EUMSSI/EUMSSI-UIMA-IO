@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.eumssi.uima</groupId>
 	<artifactId>eumssi-io</artifactId>
-	<version>0.6-SNAPSHOT</version>
+	<version>0.7-SNAPSHOT</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -101,7 +101,7 @@
 		<dependency>
 			<groupId>eu.eumssi.uima</groupId>
 			<artifactId>EumssiTS</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
@@ -123,7 +123,7 @@
 		<dependency>
 			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
 			<artifactId>de.tudarmstadt.ukp.dkpro.core.api.ner-asl</artifactId>
-			</dependency>
+		</dependency>
 		<dependency>
 			<groupId>edu.upf.glicom.uima</groupId>
 			<artifactId>ConfirmLinkAnnotator</artifactId>
@@ -138,6 +138,11 @@
 			<groupId>com.iai.uima</groupId>
 			<artifactId>kea-annotator</artifactId>
 			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.7</version>
 		</dependency>
 	</dependencies>
 	<repositories>
