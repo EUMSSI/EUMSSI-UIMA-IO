@@ -89,10 +89,10 @@ public class AsrNerConsumer extends MongoConsumerBase {
 		//updates.append("meta.extracted.audio_transcript.pretty_html", prettyAsrDbObject);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(entityList); 
-		updates.append("meta.extracted.audio_transcript-dbpedia", json); // generate a single string as result
+		updates.append(this.outputField, json); // generate a single string as result
 		BasicDBObject update = new BasicDBObject();
 		update.append("$set", updates);
-		update.append("$addToSet", new BasicDBObject("processing.available_data", "audio_transcript-dbpediajson"));
+		update.append("$addToSet", new BasicDBObject("processing.available_data", this.queueName));
 		try {
 			coll.update(query, update);
 			logger.fine(json);
